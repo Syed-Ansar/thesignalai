@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Panel, fieldCls, putRestaurant, useSaveRestaurant } from "@/components/admin/shared";
+import { SlugField } from "@/components/admin/SlugField";
 import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
 import { errorDetail } from "@/lib/errors";
 import type { OwnerOut, Restaurant, RewardConfig } from "@/lib/types";
@@ -24,6 +25,7 @@ function DetailsForm({ restaurant }: { restaurant: Restaurant }) {
   });
   const setReward = <K extends keyof RewardConfig>(k: K, v: RewardConfig[K]) => setForm((f) => ({ ...f, reward: { ...f.reward, [k]: v } }));
   const save = useSaveRestaurant(restaurant.id, "Restaurant details saved");
+  const [slugOk, setSlugOk] = useState(true);
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }));
 
   return (
@@ -40,11 +42,7 @@ function DetailsForm({ restaurant }: { restaurant: Restaurant }) {
             <Label htmlFor="r-name">Name</Label>
             <input id="r-name" data-testid="setup-name-input" className={fieldCls} value={form.name} onChange={(e) => set("name", e.target.value)} required />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="r-slug">Link slug</Label>
-            <input id="r-slug" data-testid="setup-slug-input" className={fieldCls} value={form.slug} onChange={(e) => set("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))} required />
-            <p className="text-[11px] text-[#A8A29E]">/{form.slug || "…"}</p>
-          </div>
+          <SlugField restaurant={restaurant} value={form.slug} onChange={(v) => set("slug", v)} onValidity={setSlugOk} />
           <div className="space-y-1.5">
             <Label htmlFor="r-loc">Location</Label>
             <input id="r-loc" data-testid="setup-location-input" className={fieldCls} value={form.location} onChange={(e) => set("location", e.target.value)} />
@@ -105,7 +103,7 @@ function DetailsForm({ restaurant }: { restaurant: Restaurant }) {
       </Panel>
 
       <div className="flex justify-end">
-        <Button data-testid="setup-save-button" type="submit" disabled={save.isPending} className="h-10 bg-[#EA580C] px-6 hover:bg-[#C2410C]">
+        <Button data-testid="setup-save-button" type="submit" disabled={save.isPending || !slugOk} className="h-10 bg-[#EA580C] px-6 hover:bg-[#C2410C]">
           {save.isPending ? <Loader2 className="size-4 animate-spin" /> : "Save details"}
         </Button>
       </div>

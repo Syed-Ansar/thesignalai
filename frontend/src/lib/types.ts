@@ -33,6 +33,7 @@ export interface MenuItem {
 export interface Restaurant {
   id: string;
   slug: string;
+  slug_aliases: string[];
   name: string;
   location: string;
   google_place_id: string;
@@ -241,4 +242,12 @@ export interface Leaderboard {
 
 export interface AwardIn {
   weeks_ago: number;
+}
+
+export interface SlugCheck {
+  slug: string;
+  available: boolean;
+  current: boolean;
+  reason: string | null;
+  suggestions: string[];
 }

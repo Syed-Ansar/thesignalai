@@ -66,6 +66,7 @@ class MenuItemIn(BaseModel):
 class Restaurant(Stamped):
     id: str = Field(default_factory=_uid)
     slug: str = Field(pattern=SLUG, max_length=60)
+    slug_aliases: List[str] = []  # earlier link names; they keep redirecting to the current slug
     name: str = Field(min_length=1, max_length=80)
     location: str = ""
     google_place_id: str = ""
@@ -335,3 +336,11 @@ class Leaderboard(BaseModel):
 
 class AwardIn(BaseModel):
     weeks_ago: int = Field(0, ge=0, le=12)
+
+
+class SlugCheck(BaseModel):
+    slug: str  # normalized form of what was typed
+    available: bool
+    current: bool  # it's this restaurant's link right now
+    reason: Optional[str] = None
+    suggestions: List[str] = []

@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from lib.auth import accessible_restaurant, current_user, hash_password, require_super, restaurant_scope
 from lib.dates import week_bounds
+from lib import slugs
 from lib.db import db
 from lib.rewards import deliver_whatsapp, reward_code
 from models.studio import (
@@ -32,25 +33,24 @@ from models.studio import (
     ReviewLog,
     RewardClaim,
     RewardConfig,
+    SlugCheck,
 )
 
 router = APIRouter(prefix="/admin")
 
 
 def slugify(name: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:60] or "restaurant"
-
-
-RESERVED_SLUGS = {"admin", "api", "app", "assets", "static", "sw", "manifest", "favicon"}
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:34].strip("-") or "restaurant"
 
 
 async def _slug_taken(slug: str, exclude_id: Optional[str] = None) -> bool:
-    if slug in RESERVED_SLUGS:
-        return True
-    q: dict = {"$or": [{"slug": slug}, {"id": slug}]}
-    if exclude_id:
-        q["id"] = {"$ne": exclude_id}
-    return await db.restaurants.find_one(q, {"_id": 1}) is not None
+    return not await slugs.is_free(slug, exclude_id)
+
+
+@router.get("/slug-check", response_model=SlugCheck)
+async def slug_check(slug: str = Query(..., max_length=80), restaurant_id: Optional[str] = Query(None), user: dict = Depends(current_user)):
+    """Instant availability check for a guest link name, with suggestions when it's taken."""
+    return await slugs.check(slug, restaurant_id)
 
 
 # ---------- restaurants ----------
@@ -80,8 +80,16 @@ async def get_restaurant(restaurant: dict = Depends(accessible_restaurant)):
 @router.patch("/restaurants/{rid}", response_model=Restaurant)
 async def update_restaurant(body: RestaurantUpdate, restaurant: dict = Depends(accessible_restaurant)):
     changes = body.model_dump(exclude_none=True)  # whitelisted fields only
-    if "slug" in changes and await _slug_taken(changes["slug"], restaurant["id"]):
-        raise HTTPException(status_code=409, detail="That link slug is already used")
+    if "slug" in changes:
+        if changes["slug"] == restaurant["slug"]:
+            changes.pop("slug")
+        else:
+            res = await slugs.check(changes["slug"], restaurant["id"])
+            if not res.available:
+                raise HTTPException(status_code=409, detail=res.reason or "That link name isn't available")
+            # keep the old link answering (printed posters) and free the new one from the alias list
+            aliases = [a for a in [*restaurant.get("slug_aliases", []), restaurant["slug"]] if a != changes["slug"]]
+            changes["slug_aliases"] = list(dict.fromkeys(aliases))
     for k in ("name", "location", "google_place_id", "whatsapp_number"):
         if k in changes:
             changes[k] = changes[k].strip()

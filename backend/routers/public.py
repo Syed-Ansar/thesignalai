@@ -43,7 +43,7 @@ OTP_SENDS_PER_10_MIN = 3
 
 async def _restaurant(slug: str) -> dict:
     key = slug.strip().lower()
-    doc = await db.restaurants.find_one({"$or": [{"slug": key}, {"id": key}]}, {"_id": 0})
+    doc = await db.restaurants.find_one({"$or": [{"slug": key}, {"id": key}, {"slug_aliases": key}]}, {"_id": 0})
     if not doc:
         raise HTTPException(status_code=404, detail="Restaurant not found")
     return doc

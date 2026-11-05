@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { GuestFlow } from "@/components/guest/GuestFlow";
@@ -15,6 +15,7 @@ export default function Guest() {
   const { slug: pathSlug } = useParams();
   const slug = (pathSlug ?? "").toLowerCase();
   const online = useOnline();
+  const navigate = useNavigate();
   const cacheKey = `restaurant:${slug}`;
 
   // Restaurant config (menu, theme, links) is cached on the phone so the flow works offline.
@@ -33,6 +34,11 @@ export default function Guest() {
   useEffect(() => {
     if (data) document.title = `${data.name} · Rate, share & win`;
   }, [data]);
+
+  // Old link names and restaurant ids resolve too; move the guest to the current short link.
+  useEffect(() => {
+    if (data && data.slug !== slug) navigate(`/${data.slug}${window.location.search}`, { replace: true });
+  }, [data, slug, navigate]);
 
   // Offline queue: flush on reconnect, on SW background-sync, and on load if anything is pending.
   useEffect(() => {

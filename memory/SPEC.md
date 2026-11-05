@@ -25,6 +25,9 @@ WHATSAPP_SENDER=auto → meta_cloud (Meta Cloud API template `WHATSAPP_TEMPLATE_
 ## Weekly leaderboard (owner-only)
 guest_runs {restaurant_id, phone, name, coins (client-reported, 0–400), source, ref_client_id, contact_method, created_at}, inserted on every reward claim (deduped by ref_client_id). GET /admin/restaurants/{rid}/leaderboard?weeks_ago=0|1 → Mon–Sun week in APP_TZ (Asia/Kolkata), top 20 by coins summed per phone. POST …/leaderboard/award {weeks_ago} → RewardClaim source="leaderboard", title=reward.weekly_prize, week_start set; one per week (409 on repeat); WhatsApp sent. Admin tab "Weekly Leaderboard".
 
+## Custom short links
+Setup → "Guest link" (SlugField): debounced GET /admin/slug-check?slug=&restaurant_id= → {slug (normalized), available, current, reason, suggestions[3]}. Rules (lib/slugs.py): 3–40 chars, a-z 0-9 single dashes, not reserved (admin, api, app, assets, static, sw, manifest, favicon, login, www, help), not another restaurant's slug/id/alias. Save is blocked until available. On change the old slug is pushed to restaurant.slug_aliases, so old links/posters keep working; public lookup matches slug | id | slug_aliases and the Guest page redirects to the canonical /{slug}.
+
 ## QR poster
 Admin tab "QR Poster": one A4 poster per restaurant (QR → {origin}/{slug}, restaurant theme, today's reward), Print poster (print CSS shows only #qr-poster), Copy link, Open.
 
