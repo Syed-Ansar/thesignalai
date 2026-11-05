@@ -316,6 +316,7 @@ export function GuestFlow({ restaurant: r, online, preview = false }: Props) {
                 base={base}
                 source={happy ? "review" : "feedback"}
                 refClientId={refId}
+                coins={coins + COINS.reward}
                 preview={preview}
                 online={online}
                 googleUrl={happy && !preview ? r.google_review_url : null}

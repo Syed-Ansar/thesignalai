@@ -43,7 +43,7 @@ function DetailsForm({ restaurant }: { restaurant: Restaurant }) {
           <div className="space-y-1.5">
             <Label htmlFor="r-slug">Link slug</Label>
             <input id="r-slug" data-testid="setup-slug-input" className={fieldCls} value={form.slug} onChange={(e) => set("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))} required />
-            <p className="text-[11px] text-[#A8A29E]">/app/{form.slug || "…"}</p>
+            <p className="text-[11px] text-[#A8A29E]">/{form.slug || "…"}</p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="r-loc">Location</Label>
@@ -88,6 +88,10 @@ function DetailsForm({ restaurant }: { restaurant: Restaurant }) {
           <div className="space-y-1.5">
             <Label htmlFor="rw-details">Fine print</Label>
             <input id="rw-details" data-testid="setup-reward-details-input" className={fieldCls} value={form.reward.details} onChange={(e) => setReward("details", e.target.value)} maxLength={240} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="rw-weekly">Weekly top-guest prize</Label>
+            <input id="rw-weekly" data-testid="setup-reward-weekly-input" className={fieldCls} value={form.reward.weekly_prize} onChange={(e) => setReward("weekly_prize", e.target.value)} maxLength={80} required />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="rw-days">Valid for (days)</Label>

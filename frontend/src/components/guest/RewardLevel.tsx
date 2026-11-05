@@ -7,13 +7,15 @@ import { ArcadeButton, Dock, LevelHead, SPRING_POP, TextButton } from "@/compone
 import { ScratchCard } from "@/components/guest/ScratchCard";
 import { apiPost } from "@/lib/api";
 import { errorDetail } from "@/lib/errors";
-import type { OtpCheckOut, OtpSendOut, PublicRestaurant, RewardClaim, RewardClaimIn, RewardSource } from "@/lib/types";
+import type { GuestSource, OtpCheckOut, OtpSendOut, PublicRestaurant, RewardClaim, RewardClaimIn } from "@/lib/types";
 
 interface Props {
   restaurant: PublicRestaurant;
   base: string;
-  source: RewardSource;
+  source: GuestSource;
   refClientId: string | null;
+  /** Coins the guest will finish the run with (reported for the owner's weekly leaderboard). */
+  coins: number;
   preview: boolean;
   online: boolean;
   googleUrl: string | null;
@@ -26,7 +28,7 @@ type Stage = "details" | "code" | "scratch";
 const inputCls =
   "h-[56px] w-full rounded-[var(--g-btn-r)] border-2 border-[var(--g-line)] bg-[var(--g-card)] px-4 text-[17px] font-medium text-[var(--g-card-ink)] outline-none transition-[border-color] duration-150 placeholder:text-[var(--g-muted)]/70 focus:border-[var(--g-accent)]";
 
-function previewClaim(r: PublicRestaurant, source: RewardSource, name: string, phone: string): RewardClaim {
+function previewClaim(r: PublicRestaurant, source: GuestSource, name: string, phone: string): RewardClaim {
   const now = new Date();
   return {
     id: "preview",
@@ -41,11 +43,14 @@ function previewClaim(r: PublicRestaurant, source: RewardSource, name: string, p
     ref_client_id: null,
     expires_at: new Date(now.getTime() + r.reward.valid_days * 86400000).toISOString(),
     redeemed_at: null,
+    week_start: null,
+    whatsapp_status: null,
+    whatsapp_error: null,
     created_at: now.toISOString(),
   };
 }
 
-export function RewardLevel({ restaurant: r, base, source, refClientId, preview, online, googleUrl, onRevealed, onDone }: Props) {
+export function RewardLevel({ restaurant: r, base, source, refClientId, coins, preview, online, googleUrl, onRevealed, onDone }: Props) {
   const needsCode = r.otp_available && !preview;
   const [stage, setStage] = useState<Stage>("details");
   const [name, setName] = useState("");
@@ -62,7 +67,7 @@ export function RewardLevel({ restaurant: r, base, source, refClientId, preview,
   const claimM = useMutation({
     mutationFn: (verificationId: string | null) => {
       if (preview) return Promise.resolve(previewClaim(r, source, name, phone));
-      const body: RewardClaimIn = { name: name.trim(), phone, verification_id: verificationId, source, ref_client_id: refClientId };
+      const body: RewardClaimIn = { name: name.trim(), phone, verification_id: verificationId, source, ref_client_id: refClientId, coins: Math.min(400, coins) };
       return apiPost<RewardClaim>(`${base}/rewards/claim`, body);
     },
     onSuccess: (c) => {
@@ -225,6 +230,11 @@ export function RewardLevel({ restaurant: r, base, source, refClientId, preview,
               {revealed ? (
                 <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={SPRING_POP} data-testid="reward-details" className="mt-4 text-center text-[14px] text-[var(--g-muted)]">
                   {claim.details}
+                  {r.whatsapp_delivery && !preview && (
+                    <span data-testid="reward-whatsapp-note" className="mt-1.5 block font-semibold text-[#15803D]">
+                      We've also sent this code to your WhatsApp.
+                    </span>
+                  )}
                 </motion.p>
               ) : (
                 <TextButton data-testid="scratch-reveal-button" onClick={reveal} className="mt-3 self-center">

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { GuestFlow } from "@/components/guest/GuestFlow";
@@ -9,13 +9,11 @@ import { DEFAULT_THEME, themeVars } from "@/lib/theme";
 import { useOnline } from "@/hooks/useOnline";
 import { ApiError, apiGet } from "@/lib/api";
 import { cacheGet, cacheSet, flushQueue, getQueue } from "@/lib/offline";
-import { DEFAULT_SLUG } from "@/lib/tags";
 import type { PublicRestaurant } from "@/lib/types";
 
 export default function Guest() {
   const { slug: pathSlug } = useParams();
-  const [params] = useSearchParams();
-  const slug = (pathSlug ?? params.get("restaurant") ?? DEFAULT_SLUG).toLowerCase();
+  const slug = (pathSlug ?? "").toLowerCase();
   const online = useOnline();
   const cacheKey = `restaurant:${slug}`;
 

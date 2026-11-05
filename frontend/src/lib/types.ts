@@ -19,9 +19,11 @@ export interface RewardConfig {
   details: string;
   sorry_title: string;
   valid_days: number;
+  weekly_prize: string;
 }
 
-export type PublicReward = RewardConfig;
+/** Guest-facing reward (weekly_prize is owner-only and never sent to guests). */
+export type PublicReward = Omit<RewardConfig, "weekly_prize">;
 
 export interface MenuItem {
   id: string;
@@ -67,6 +69,7 @@ export interface PublicRestaurant {
   otp_available: boolean;
   whatsapp_enabled: boolean;
   sms_demo: boolean;
+  whatsapp_delivery: boolean;
   google_review_url: string;
   reward: PublicReward;
 }
@@ -187,14 +190,17 @@ export interface WhatsappOut {
   verification_id: string;
 }
 
-export type RewardSource = "review" | "feedback";
+export type RewardSource = "review" | "feedback" | "leaderboard";
+export type GuestSource = "review" | "feedback";
+export type WhatsappStatus = "sent" | "failed" | "not_configured";
 
 export interface RewardClaimIn {
   name: string;
   phone: string;
   verification_id: string | null;
-  source: RewardSource;
+  source: GuestSource;
   ref_client_id: string | null;
+  coins: number;
 }
 
 export interface RewardClaim {
@@ -210,5 +216,29 @@ export interface RewardClaim {
   ref_client_id: string | null;
   expires_at: string;
   redeemed_at: string | null;
+  week_start: string | null;
+  whatsapp_status: WhatsappStatus | null;
+  whatsapp_error: string | null;
   created_at: string;
+}
+
+export interface LeaderEntry {
+  rank: number;
+  name: string | null;
+  phone: string;
+  coins: number;
+  runs: number;
+}
+
+export interface Leaderboard {
+  week_start: string;
+  week_end: string;
+  weeks_ago: number;
+  prize_title: string;
+  entries: LeaderEntry[];
+  award: RewardClaim | null;
+}
+
+export interface AwardIn {
+  weeks_ago: number;
 }

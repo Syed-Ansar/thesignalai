@@ -4,13 +4,15 @@ require_super for platform-scope actions (403). Queries always filter by the gat
 import re
 import uuid
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from lib.auth import accessible_restaurant, current_user, hash_password, require_super, restaurant_scope
+from lib.dates import week_bounds
 from lib.db import db
+from lib.rewards import deliver_whatsapp, reward_code
 from models.studio import (
     Analytics,
     CrmFeedback,
@@ -24,8 +26,12 @@ from models.studio import (
     Restaurant,
     RestaurantCreate,
     RestaurantUpdate,
+    AwardIn,
+    LeaderEntry,
+    Leaderboard,
     ReviewLog,
     RewardClaim,
+    RewardConfig,
 )
 
 router = APIRouter(prefix="/admin")
@@ -35,8 +41,13 @@ def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:60] or "restaurant"
 
 
+RESERVED_SLUGS = {"admin", "api", "app", "assets", "static", "sw", "manifest", "favicon"}
+
+
 async def _slug_taken(slug: str, exclude_id: Optional[str] = None) -> bool:
-    q: dict = {"slug": slug}
+    if slug in RESERVED_SLUGS:
+        return True
+    q: dict = {"$or": [{"slug": slug}, {"id": slug}]}
     if exclude_id:
         q["id"] = {"$ne": exclude_id}
     return await db.restaurants.find_one(q, {"_id": 1}) is not None
@@ -213,3 +224,66 @@ async def redeem_reward(cid: str, restaurant: dict = Depends(accessible_restaura
     await db.reward_claims.update_one({"id": cid}, {"$set": {"redeemed_at": now}})
     doc["redeemed_at"] = now
     return RewardClaim(**doc)
+
+
+@router.post("/restaurants/{rid}/rewards/{cid}/whatsapp", response_model=RewardClaim)
+async def resend_reward_whatsapp(cid: str, restaurant: dict = Depends(accessible_restaurant)):
+    doc = await db.reward_claims.find_one({"id": cid, "restaurant_id": restaurant["id"]}, {"_id": 0})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Reward not found")
+    return RewardClaim(**await deliver_whatsapp(RewardClaim(**doc).model_dump()))
+
+
+# ---------- weekly leaderboard (owner-only) ----------
+async def _leaderboard(restaurant: dict, weeks_ago: int) -> Leaderboard:
+    start, end = week_bounds(weeks_ago)
+    rid = restaurant["id"]
+    pipeline = [
+        {"$match": {"restaurant_id": rid, "created_at": {"$gte": start, "$lt": end}}},
+        {"$sort": {"created_at": 1}},
+        {"$group": {"_id": "$phone", "coins": {"$sum": "$coins"}, "runs": {"$sum": 1}, "name": {"$last": "$name"}, "first": {"$min": "$created_at"}}},
+        {"$sort": {"coins": -1, "first": 1}},
+        {"$limit": 20},
+    ]
+    rows = await db.guest_runs.aggregate(pipeline).to_list(20)
+    week_start = start.date().isoformat()
+    award = await db.reward_claims.find_one({"restaurant_id": rid, "source": "leaderboard", "week_start": week_start}, {"_id": 0})
+    return Leaderboard(
+        week_start=week_start,
+        week_end=(end - timedelta(days=1)).date().isoformat(),
+        weeks_ago=weeks_ago,
+        prize_title=RewardConfig(**(restaurant.get("reward") or {})).weekly_prize,
+        entries=[LeaderEntry(rank=i + 1, name=r.get("name"), phone=r["_id"], coins=r["coins"], runs=r["runs"]) for i, r in enumerate(rows)],
+        award=RewardClaim(**award) if award else None,
+    )
+
+
+@router.get("/restaurants/{rid}/leaderboard", response_model=Leaderboard)
+async def leaderboard(weeks_ago: int = Query(0, ge=0, le=12), restaurant: dict = Depends(accessible_restaurant)):
+    return await _leaderboard(restaurant, weeks_ago)
+
+
+@router.post("/restaurants/{rid}/leaderboard/award", response_model=RewardClaim)
+async def award_top_guest(body: AwardIn, restaurant: dict = Depends(accessible_restaurant)):
+    board = await _leaderboard(restaurant, body.weeks_ago)
+    if board.award:
+        raise HTTPException(status_code=409, detail="This week's prize was already awarded")
+    if not board.entries:
+        raise HTTPException(status_code=400, detail="No guests on the leaderboard this week")
+    top = board.entries[0]
+    last_run = await db.guest_runs.find_one({"restaurant_id": restaurant["id"], "phone": top.phone}, {"_id": 0}, sort=[("created_at", -1)])
+    cfg = RewardConfig(**(restaurant.get("reward") or {}))
+    claim = RewardClaim(
+        restaurant_id=restaurant["id"],
+        code=reward_code(restaurant["name"]),
+        title=cfg.weekly_prize,
+        details=f"Weekly top guest ({top.coins} coins). {cfg.details}",
+        source="leaderboard",
+        contact_name=top.name,
+        contact_phone=top.phone,
+        contact_method=(last_run or {}).get("contact_method") or "unverified",
+        expires_at=datetime.now(timezone.utc) + timedelta(days=cfg.valid_days),
+        week_start=board.week_start,
+    )
+    await db.reward_claims.insert_one(claim.model_dump())
+    return RewardClaim(**await deliver_whatsapp(claim.model_dump()))

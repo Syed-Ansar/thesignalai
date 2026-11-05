@@ -2,7 +2,6 @@
 
 import logging
 import random
-import string
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -11,7 +10,9 @@ from fastapi import APIRouter, HTTPException
 from adapters.channels import get_review_destination, get_whatsapp_adapter
 from adapters.otp import OtpError, get_otp_adapter, normalize_phone
 from lib.db import db
+from adapters.messaging import get_reward_messenger
 from lib.drafts import generate_unique_draft
+from lib.rewards import deliver_in_background, reward_code
 from lib.pii import sanitize
 from models.studio import (
     CrmFeedback,
@@ -41,7 +42,8 @@ OTP_SENDS_PER_10_MIN = 3
 
 
 async def _restaurant(slug: str) -> dict:
-    doc = await db.restaurants.find_one({"slug": slug}, {"_id": 0})
+    key = slug.strip().lower()
+    doc = await db.restaurants.find_one({"$or": [{"slug": key}, {"id": key}]}, {"_id": 0})
     if not doc:
         raise HTTPException(status_code=404, detail="Restaurant not found")
     return doc
@@ -74,6 +76,7 @@ async def public_restaurant(slug: str):
         otp_available=_verification_required(r),
         whatsapp_enabled=bool(r.get("whatsapp_number", "").strip()),
         sms_demo=adapter.demo,
+        whatsapp_delivery=get_reward_messenger().available(),
         google_review_url=get_review_destination().review_url(r.get("google_place_id", ""), r["name"], r.get("location", "")),
         reward=PublicReward(**reward.model_dump()),
     )
@@ -153,8 +156,8 @@ async def otp_send(slug: str, body: OtpSendIn):
     try:
         demo_code = await adapter.send(phone)
     except OtpError as exc:
-        logger.error("otp send failed: %s", exc)
-        raise HTTPException(status_code=502, detail="Couldn't send the code right now")
+        logger.error("otp send failed (%s): %s", exc.code, exc)
+        raise HTTPException(status_code=exc.status, detail=str(exc))
     await db.otp_sends.insert_one({"phone": phone, "restaurant_id": r["id"], "provider": adapter.name, "created_at": datetime.now(timezone.utc)})
     return OtpSendOut(sent=True, available=True, phone=phone, demo_code=demo_code)
 
@@ -166,8 +169,8 @@ async def otp_check(slug: str, body: OtpCheckIn):
     try:
         ok = await get_otp_adapter().check(phone, body.code.strip())
     except OtpError as exc:
-        logger.error("otp check failed: %s", exc)
-        raise HTTPException(status_code=502, detail="Couldn't check the code right now")
+        logger.error("otp check failed (%s): %s", exc.code, exc)
+        raise HTTPException(status_code=exc.status, detail=str(exc))
     if not ok:
         return OtpCheckOut(verified=False)
     vid = str(uuid.uuid4())
@@ -193,11 +196,6 @@ async def whatsapp_verify(slug: str, body: WhatsappIn):
     return WhatsappOut(link=get_whatsapp_adapter().build_link(r["whatsapp_number"], msg), code=f"RV-{code}", verification_id=vid)
 
 
-def _reward_code(name: str) -> str:
-    prefix = "".join(c for c in name.upper() if c.isalpha())[:4] or "GIFT"
-    return f"{prefix}-{''.join(random.choices(string.ascii_uppercase + string.digits, k=5))}"
-
-
 @router.post("/restaurants/{slug}/rewards/claim", response_model=RewardClaim)
 async def claim_reward(slug: str, body: RewardClaimIn):
     """Scratch-card reward. Needs a verified phone when SMS verification is on for this restaurant.
@@ -216,16 +214,24 @@ async def claim_reward(slug: str, body: RewardClaimIn):
         raise HTTPException(status_code=403, detail="Verify your number to unlock the reward")
 
     now = datetime.now(timezone.utc)
+    name = body.name.strip() or None
+    # Every finished run counts toward the weekly leaderboard (deduped per review/feedback).
+    if not body.ref_client_id or not await db.guest_runs.find_one({"restaurant_id": r["id"], "ref_client_id": body.ref_client_id}, {"_id": 1}):
+        await db.guest_runs.insert_one(
+            {"id": str(uuid.uuid4()), "restaurant_id": r["id"], "phone": phone, "name": name, "coins": body.coins,
+             "source": body.source, "ref_client_id": body.ref_client_id, "contact_method": method, "created_at": now}
+        )
     existing = await db.reward_claims.find_one(
-        {"restaurant_id": r["id"], "contact_phone": phone, "redeemed_at": None, "expires_at": {"$gt": now}}, {"_id": 0}
+        {"restaurant_id": r["id"], "contact_phone": phone, "redeemed_at": None, "expires_at": {"$gt": now},
+         "source": {"$in": ["review", "feedback"]}},
+        {"_id": 0},
     )
     if existing:
         return RewardClaim(**existing)
 
-    name = body.name.strip() or None
     claim = RewardClaim(
         restaurant_id=r["id"],
-        code=_reward_code(r["name"]),
+        code=reward_code(r["name"]),
         title=cfg.sorry_title if body.source == "feedback" else cfg.title,
         details=cfg.details,
         source=body.source,
@@ -242,4 +248,5 @@ async def claim_reward(slug: str, body: RewardClaimIn):
         if body.source == "review":
             update["contact_method"] = method
         await coll.update_one({"restaurant_id": r["id"], "client_id": body.ref_client_id}, {"$set": update})
+    deliver_in_background(claim.model_dump())
     return claim

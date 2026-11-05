@@ -1,7 +1,7 @@
 # Review Studio — SPEC (multi-tenant guest review + admin studio)
 
 ## Who
-- Guests (no login) at `/app/{slug}`, `/?restaurant={slug}`, or `/` (default `kaka-restaurant`). Phone-first, max 480px, image-free.
+- Guests (no login) at `/{slug}` or `/{restaurant id}` (e.g. /kaka-restaurant, /rest-kaka). No default restaurant: `/` and unknown multi-segment paths redirect to `/admin`; legacy `/app/{slug}` redirects to `/{slug}`. Reserved slugs (admin, api, app, assets, static, sw, manifest, favicon) are rejected. Phone-first, max 480px, image-free.
 - Owners (email+password) → only restaurants in `users.restaurant_ids`.
 - Super-admin (`users.platform_role="superadmin"`) → all restaurants, create workspaces, add/remove owner logins.
 Credentials: memory/test_credentials.md.
@@ -17,7 +17,16 @@ HUD (sticky): restaurant name/location, coin counter with floating "+N" pops (co
 - Preview mode (admin phone mockup): no writes, no Google, fake reward code PREVIEW-123.
 
 ## Rewards
-restaurant.reward {enabled, title (4–5★), sorry_title (1–3★), details, valid_days}; edited in Setup tab "Scratch-card reward". Claim requires verified phone when otp_enabled and the SMS adapter is available; one open (unredeemed, unexpired) claim per phone per restaurant (repeat returns same code). Claim attaches contact to the review_log / crm_feedback via ref_client_id. Admin "Rewards" tab: list, search by code/phone, Mark redeemed.
+restaurant.reward {enabled, title (4–5★), sorry_title (1–3★), details, valid_days, weekly_prize}; edited in Setup tab "Scratch-card reward". Claim requires verified phone when otp_enabled and the SMS adapter is available; one open (unredeemed, unexpired) claim per phone per restaurant (repeat returns same code). Claim attaches contact to the review_log / crm_feedback via ref_client_id. Admin "Rewards" tab: list, search by code/phone, Mark redeemed.
+
+## WhatsApp reward delivery (adapters/messaging.py, lib/rewards.py)
+WHATSAPP_SENDER=auto → meta_cloud (Meta Cloud API template `WHATSAPP_TEMPLATE_NAME`/`WHATSAPP_TEMPLATE_LANGUAGE`, 4 body vars: name, reward title, code, expiry) when WHATSAPP_ACCESS_TOKEN + WHATSAPP_PHONE_NUMBER_ID exist, else disabled. Each new claim is sent in the background; claim.whatsapp_status sent|failed|not_configured (+whatsapp_error). Admin Rewards tab shows the status and has a Resend button (POST /admin/restaurants/{rid}/rewards/{cid}/whatsapp). PublicRestaurant.whatsapp_delivery drives the guest note "We've also sent this code to your WhatsApp."
+
+## Weekly leaderboard (owner-only)
+guest_runs {restaurant_id, phone, name, coins (client-reported, 0–400), source, ref_client_id, contact_method, created_at}, inserted on every reward claim (deduped by ref_client_id). GET /admin/restaurants/{rid}/leaderboard?weeks_ago=0|1 → Mon–Sun week in APP_TZ (Asia/Kolkata), top 20 by coins summed per phone. POST …/leaderboard/award {weeks_ago} → RewardClaim source="leaderboard", title=reward.weekly_prize, week_start set; one per week (409 on repeat); WhatsApp sent. Admin tab "Weekly Leaderboard".
+
+## QR poster
+Admin tab "QR Poster": one A4 poster per restaurant (QR → {origin}/{slug}, restaurant theme, today's reward), Print poster (print CSS shows only #qr-poster), Copy link, Open.
 
 ## AI drafts (lib/drafts.py)
 Adapter adapters/drafts.py (gpt-4o-mini via EMERGENT_LLM_KEY, temp 0.9). DraftRequest.tone ∈ foodie|crisp|desi → DraftResponse {text, tone, tone_label, source, rewrites}. Uniqueness vs last 300 review texts + existing_reviews (>0.85 → up to 2 rewrites then reshuffle).

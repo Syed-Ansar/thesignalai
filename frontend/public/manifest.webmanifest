@@ -1,7 +1,6 @@
 {
   "name": "Review Studio — Share Your Experience",
   "short_name": "Review Studio",
-  "start_url": "/",
   "display": "standalone",
   "background_color": "#FDFBF7",
   "theme_color": "#292524",

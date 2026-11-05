@@ -48,6 +48,7 @@ export function toPublic(r: Restaurant, theme?: Theme): PublicRestaurant {
     otp_available: r.otp_enabled,
     whatsapp_enabled: !!r.whatsapp_number.trim(),
     sms_demo: true,
+    whatsapp_delivery: false,
     google_review_url: "",
     reward: r.reward,
   };

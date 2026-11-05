@@ -8,8 +8,6 @@ export const CRM_ISSUES = ["Food Taste / Spice", "Order Delay", "Staff Behaviour
 export const STAR_LABELS = ["Tap a star", "Not great", "Could be better", "It was okay", "Really good!", "Absolutely loved it!"];
 export const STAR_FACES = ["🍽️", "😞", "😕", "😐", "😋", "🤩"];
 
-export const DEFAULT_SLUG = "kaka-restaurant";
-
 export const TONES: { key: Tone; label: string; emoji: string }[] = [
   { key: "foodie", label: "Foodie", emoji: "🍛" },
   { key: "crisp", label: "Quick & Crisp", emoji: "⚡" },

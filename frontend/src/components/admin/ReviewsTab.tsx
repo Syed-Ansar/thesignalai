@@ -28,7 +28,7 @@ export function ReviewsTab({ restaurant }: { restaurant: Restaurant }) {
   const analytics = useQuery({ queryKey: ["analytics", rid], queryFn: () => apiGet<Analytics>(`/admin/restaurants/${rid}/analytics`) });
   const reviews = useQuery({ queryKey: ["reviews", rid], queryFn: () => apiGet<ReviewLog[]>(`/admin/restaurants/${rid}/reviews`) });
   const a = analytics.isError ? undefined : analytics.data;
-  const guestLink = `${window.location.origin}/app/${restaurant.slug}`;
+  const guestLink = `${window.location.origin}/${restaurant.slug}`;
 
   return (
     <div className="space-y-5">

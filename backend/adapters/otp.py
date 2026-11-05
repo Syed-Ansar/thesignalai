@@ -20,7 +20,22 @@ from lib.db import db
 
 
 class OtpError(Exception):
-    pass
+    def __init__(self, message: str, code: str = "", status: int = 502):
+        super().__init__(message)
+        self.code = code
+        self.status = status  # HTTP status the API should answer with
+
+
+# Twilio Verify error codes -> (http status, guest-readable message)
+TWILIO_ERRORS = {
+    "60200": (422, "That number doesn't look right. Check it and try again."),
+    "21211": (422, "That number doesn't look right. Check it and try again."),
+    "21608": (422, "This number can't receive codes yet (trial account: verify it in Twilio first)."),
+    "60203": (429, "Too many codes sent to this number. Try again in 10 minutes."),
+    "60202": (429, "Too many wrong codes. Request a new one in 10 minutes."),
+    "60205": (422, "This number can't receive SMS. Try a mobile number."),
+    "60410": (422, "SMS to this number is blocked. Try another number."),
+}
 
 
 class OtpAdapter(Protocol):
@@ -49,7 +64,14 @@ class TwilioVerifyAdapter:
         async with httpx.AsyncClient(timeout=15, auth=(self.sid, self.token)) as client:
             res = await client.post(f"{self.BASE}/{self.service}/{path}", data=data)
         if res.status_code >= 400:
-            raise OtpError(f"twilio {res.status_code}: {res.text[:200]}")
+            try:
+                code = str(res.json().get("code", ""))
+            except ValueError:
+                code = ""
+            status, msg = TWILIO_ERRORS.get(code, (502, "Couldn't send the code right now"))
+            if res.status_code == 404:
+                status, msg = 404, "Code expired or already used"
+            raise OtpError(msg, code=code, status=status)
         return res.json()
 
     async def send(self, phone: str) -> Optional[str]:
@@ -60,7 +82,7 @@ class TwilioVerifyAdapter:
         try:
             body = await self._post("VerificationCheck", {"To": phone, "Code": code})
         except OtpError as exc:
-            if " 404:" in str(exc):  # expired / already used verification
+            if exc.status == 404:  # expired / already used verification
                 return False
             raise
         return body.get("status") == "approved"

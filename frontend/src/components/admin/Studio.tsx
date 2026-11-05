@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, Gift, KeyRound, LogOut, MessageSquareWarning, Palette, Plus, Settings2, Sparkles } from "lucide-react";
+import { BarChart3, Gift, KeyRound, QrCode, Trophy, LogOut, MessageSquareWarning, Palette, Plus, Settings2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReviewsTab } from "@/components/admin/ReviewsTab";
@@ -8,19 +8,23 @@ import { SetupTab } from "@/components/admin/SetupTab";
 import { ThemeTab } from "@/components/admin/ThemeTab";
 import { FeedbackTab } from "@/components/admin/FeedbackTab";
 import { RewardsTab } from "@/components/admin/RewardsTab";
+import { LeaderboardTab } from "@/components/admin/LeaderboardTab";
+import { QrPosterTab } from "@/components/admin/QrPosterTab";
 import { ChangePasswordDialog, CreateRestaurantDialog } from "@/components/admin/Dialogs";
 import { apiGet } from "@/lib/api";
 import { cacheGet, cacheSet } from "@/lib/offline";
 import { endSession } from "@/lib/session";
 import type { Me, Restaurant } from "@/lib/types";
 
-type Tab = "reviews" | "setup" | "theme" | "feedback" | "rewards";
+type Tab = "reviews" | "setup" | "theme" | "feedback" | "rewards" | "leaderboard" | "qr";
 const TABS: { id: Tab; label: string; icon: typeof BarChart3 }[] = [
   { id: "reviews", label: "Review Logs & Analytics", icon: BarChart3 },
   { id: "setup", label: "Restaurant Setup & Menu", icon: Settings2 },
   { id: "theme", label: "Theme Studio", icon: Palette },
   { id: "feedback", label: "CRM Feedback", icon: MessageSquareWarning },
   { id: "rewards", label: "Rewards", icon: Gift },
+  { id: "leaderboard", label: "Weekly Leaderboard", icon: Trophy },
+  { id: "qr", label: "QR Poster", icon: QrCode },
 ];
 
 export function Studio({ me }: { me: Me }) {
@@ -40,7 +44,7 @@ export function Studio({ me }: { me: Me }) {
 
   return (
     <div className="min-h-screen bg-[#F4F2EE] text-[#1C1917]">
-      <header className="sticky top-0 z-30 border-b border-[#E7E2DA] bg-white/90 backdrop-blur">
+      <header className="sticky top-0 z-30 print:hidden border-b border-[#E7E2DA] bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 lg:px-6">
           <span className="inline-flex items-center gap-2 text-sm font-semibold">
             <Sparkles className="size-4 text-[#EA580C]" /> Review Studio
@@ -74,7 +78,7 @@ export function Studio({ me }: { me: Me }) {
       </header>
 
       <div className="mx-auto grid max-w-[1440px] gap-6 px-4 py-6 lg:grid-cols-[230px_1fr] lg:px-6">
-        <nav aria-label="Studio sections" className="-mx-4 flex gap-1 overflow-x-auto px-4 lg:mx-0 lg:flex-col lg:px-0">
+        <nav aria-label="Studio sections" className="print:hidden -mx-4 flex gap-1 overflow-x-auto px-4 lg:mx-0 lg:flex-col lg:px-0">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -102,13 +106,15 @@ export function Studio({ me }: { me: Me }) {
             <div key={current.id}>
               <div className="mb-5">
                 <h1 data-testid="studio-restaurant-name" className="font-heading text-[28px] font-semibold tracking-[-0.02em]">{current.name}</h1>
-                <p className="text-sm text-[#78716C]">{current.location || "No location set"} · /app/{current.slug}</p>
+                <p className="text-sm text-[#78716C]">{current.location || "No location set"} · /{current.slug}</p>
               </div>
               {tab === "reviews" && <ReviewsTab restaurant={current} />}
               {tab === "setup" && <SetupTab restaurant={current} isSuper={isSuper} />}
               {tab === "theme" && <ThemeTab restaurant={current} />}
               {tab === "feedback" && <FeedbackTab restaurant={current} />}
               {tab === "rewards" && <RewardsTab restaurant={current} />}
+              {tab === "leaderboard" && <LeaderboardTab restaurant={current} />}
+              {tab === "qr" && <QrPosterTab restaurant={current} />}
             </div>
           )}
         </main>

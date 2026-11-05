@@ -43,6 +43,7 @@ class RewardConfig(BaseModel):
     details: str = Field("Show this code to your server on your next visit.", max_length=240)
     sorry_title: str = Field("A free dessert, on us", min_length=1, max_length=80)
     valid_days: int = Field(30, ge=1, le=365)
+    weekly_prize: str = Field("Free meal for two", min_length=1, max_length=80)
 
 
 class PublicReward(BaseModel):
@@ -105,6 +106,7 @@ class PublicRestaurant(BaseModel):
     otp_available: bool
     whatsapp_enabled: bool
     sms_demo: bool
+    whatsapp_delivery: bool
     google_review_url: str
     reward: PublicReward
 
@@ -276,15 +278,18 @@ class WhatsappOut(BaseModel):
 
 
 # ---------- Rewards (scratch card) ----------
-RewardSource = Literal["review", "feedback"]
+RewardSource = Literal["review", "feedback", "leaderboard"]
+GuestSource = Literal["review", "feedback"]
+WhatsappStatus = Literal["sent", "failed", "not_configured"]
 
 
 class RewardClaimIn(BaseModel):
     name: str = Field("", max_length=80)
     phone: str = Field(min_length=10, max_length=20)
     verification_id: Optional[str] = None
-    source: RewardSource = "review"
+    source: GuestSource = "review"
     ref_client_id: Optional[str] = Field(None, max_length=64)
+    coins: int = Field(0, ge=0, le=400)  # coins shown in the guest HUD; feeds the owner-only weekly leaderboard
 
 
 class RewardClaim(Stamped):
@@ -300,8 +305,33 @@ class RewardClaim(Stamped):
     ref_client_id: Optional[str] = None
     expires_at: datetime
     redeemed_at: Optional[datetime] = None
+    week_start: Optional[str] = None  # leaderboard prizes: the week (YYYY-MM-DD, Monday) it was awarded for
+    whatsapp_status: Optional[WhatsappStatus] = None
+    whatsapp_error: Optional[str] = None
 
     @field_validator("expires_at", "redeemed_at")
     @classmethod
     def _aware_dates(cls, v: Optional[datetime]) -> Optional[datetime]:
         return v.replace(tzinfo=timezone.utc) if v is not None and v.tzinfo is None else v
+
+
+# ---------- Weekly leaderboard (owner-only) ----------
+class LeaderEntry(BaseModel):
+    rank: int
+    name: Optional[str] = None
+    phone: str
+    coins: int
+    runs: int
+
+
+class Leaderboard(BaseModel):
+    week_start: str  # YYYY-MM-DD (Monday, APP_TZ)
+    week_end: str  # YYYY-MM-DD (Sunday)
+    weeks_ago: int
+    prize_title: str
+    entries: List[LeaderEntry]
+    award: Optional[RewardClaim] = None
+
+
+class AwardIn(BaseModel):
+    weeks_ago: int = Field(0, ge=0, le=12)
