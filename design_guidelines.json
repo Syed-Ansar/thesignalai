@@ -1,0 +1,273 @@
+{
+  "theme": "warm_hospitality_light",
+  "app_archetype": "ORGANIC & EARTHY",
+  "design_rationale": "Inspired by Candour.app QR micro-experiences and modern Indian fine casual hospitality (Mana Restaurant, Shankarpally). Built as an offline-first PWA review assistant for mobile portrait view (max 480px centered on desktop) with zero-login friction. Warm cream/amber palette, rich saffron/terracotta kinetic triggers, pill-shaped tags, and empathetic multi-step transition flows.",
+  "colors": {
+    "surfaces": [
+      {
+        "name": "page",
+        "kind": "solid",
+        "bg": "#FDFBF7",
+        "on_bg": "#1C1917",
+        "on_bg_muted": "#57534E",
+        "roles": {
+          "border": "#E7E2DA",
+          "link": "#C2410C",
+          "error": "#B91C1C",
+          "success": "#15803D",
+          "warning": "#B45309"
+        }
+      },
+      {
+        "name": "panel",
+        "kind": "solid",
+        "bg": "#FFFFFF",
+        "on_bg": "#1C1917",
+        "on_bg_muted": "#57534E",
+        "roles": {
+          "border": "#EFEAE1",
+          "subtle_bg": "#F7F4EE"
+        }
+      },
+      {
+        "name": "banner",
+        "kind": "solid",
+        "bg": "#292524",
+        "on_bg": "#FAF8F5",
+        "on_bg_muted": "#D6D3D1",
+        "roles": {
+          "accent_badge": "#FBBF24",
+          "accent_badge_text": "#78350F"
+        }
+      },
+      {
+        "name": "pill_inactive",
+        "kind": "solid",
+        "bg": "#F5F2EB",
+        "on_bg": "#44403C",
+        "on_bg_muted": "#78716C",
+        "roles": {
+          "border": "#E7E2DA"
+        }
+      },
+      {
+        "name": "pill_active",
+        "kind": "solid",
+        "bg": "#EA580C",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#FED7AA",
+        "roles": {
+          "border": "#C2410C"
+        }
+      },
+      {
+        "name": "card_draft_selected",
+        "kind": "solid",
+        "bg": "#FFFBEB",
+        "on_bg": "#1C1917",
+        "on_bg_muted": "#78350F",
+        "roles": {
+          "border": "#F59E0B"
+        }
+      },
+      {
+        "name": "crm_banner",
+        "kind": "solid",
+        "bg": "#FEF2F2",
+        "on_bg": "#991B1B",
+        "on_bg_muted": "#B91C1C",
+        "roles": {
+          "border": "#FECACA"
+        }
+      },
+      {
+        "name": "offline_bar",
+        "kind": "solid",
+        "bg": "#451A03",
+        "on_bg": "#FEF3C7",
+        "on_bg_muted": "#FDE68A"
+      }
+    ],
+    "accent": "#EA580C",
+    "on_accent": "#FFFFFF",
+    "amber_star": "#F59E0B",
+    "gold_badge": "#D97706"
+  },
+  "typography": {
+    "font_heading": "Lora Variable",
+    "font_sans": "Plus Jakarta Sans Variable",
+    "font_mono": "JetBrains Mono Variable",
+    "scale_px": {
+      "display": 36,
+      "h1": 28,
+      "h2": 22,
+      "h3": 18,
+      "body": 16,
+      "caption": 14
+    },
+    "letter_spacing": {
+      "headline": "-0.02em",
+      "overline": "0.15em"
+    }
+  },
+  "entry_surfaces": {
+    "/": "Mobile portrait container max-480px with warm restaurant header (Mana Restaurant, Shankarpally), live offline indicator, table/POS order card, and interactive 5-star rating entry screen"
+  },
+  "layout_and_container": {
+    "max_width": "max-w-[480px]",
+    "alignment": "mx-auto min-h-screen bg-[#FDFBF7] shadow-2xl border-x border-[#EFEAE1] relative flex flex-col",
+    "desktop_backdrop": "bg-[#1E1B18] flex items-center justify-center p-0 sm:py-6 sm:px-4",
+    "pwa_safe_areas": "pt-safe pb-safe px-4 sm:px-6"
+  },
+  "step_flow_architecture": {
+    "step_0_header": "Restaurant signature header with warm amber motif, location tag 'Shankarpally, Hyderabad', POS Table #12 badge, and active offline status bar.",
+    "step_1_star_gate": {
+      "prompt": "How was your dining experience today?",
+      "component": "Interactive star selector (1 to 5 stars) with warm pulse micro-interactions and tactile score descriptions ('Poor', 'Fair', 'Average', 'Very Good', 'Exceptional!')",
+      "branching": "1-3 stars triggers CRM Resolution flow; 4-5 stars advances immediately to Step 2 AI review generation"
+    },
+    "crm_feedback_branch": {
+      "condition": "1-3 Stars selected",
+      "title": "What went wrong with your food or service?",
+      "subtitle": "Your feedback reaches our General Manager directly to make things right.",
+      "category_pills": [
+        "Food Taste/Spiciness",
+        "Order Delay",
+        "Staff Attentiveness",
+        "Cleanliness / Cutlery",
+        "Billing / POS Issue",
+        "Portion Size"
+      ],
+      "fields": [
+        "Feedback Textarea (required)",
+        "Optional Phone / Table Number"
+      ],
+      "submit_cta": "Submit Direct Feedback",
+      "resolution_state": "Thank you. Our restaurant manager has been notified directly via SMS & CRM alert. We appreciate your honesty and will address this immediately."
+    },
+    "step_2_tag_selection": {
+      "condition": "4-5 Stars selected",
+      "sections": [
+        {
+          "category": "Ordered from Your Bill (Petpooja POS)",
+          "badge": "POS Verified",
+          "pills": [
+            "Special Chicken Biryani",
+            "Paneer Tikka",
+            "Butter Naan",
+            "Mutton Rogan Josh",
+            "Gulab Jamun"
+          ]
+        },
+        {
+          "category": "Food Specialties",
+          "pills": [
+            "Delicious Biryani",
+            "Authentic Spices",
+            "Fresh Ingredients",
+            "Crispy Starters",
+            "Great Desserts"
+          ]
+        },
+        {
+          "category": "Service & Ambiance",
+          "pills": [
+            "Quick Service",
+            "Polite & Helpful Staff",
+            "Clean & Hygienic",
+            "Family Friendly",
+            "Nice Ambiance"
+          ]
+        },
+        {
+          "category": "Value & Experience",
+          "pills": [
+            "Value for Money",
+            "Generous Portions"
+          ]
+        }
+      ],
+      "optional_note": "Any specific dish name or note? (Optional)",
+      "primary_cta": "Generate 3 Review Ideas"
+    },
+    "step_3_ai_draft_cards": {
+      "description": "3 Distinct review voices tailored for Indian restaurant Google profiles",
+      "styles": [
+        {
+          "id": "short",
+          "label": "Short & Direct",
+          "badge": "15 Sec Read",
+          "desc": "Crisp, impactful, highlights key dishes & service"
+        },
+        {
+          "id": "detailed",
+          "label": "Descriptive & Detailed",
+          "badge": "Foodie Guide",
+          "desc": "Elaborates on authentic spices, ambiance & portion sizes"
+        },
+        {
+          "id": "hinglish",
+          "label": "Warm & Casual Hinglish",
+          "badge": "Local Vibe",
+          "desc": "Natural conversational Hinglish with genuine appreciation"
+        }
+      ],
+      "interaction": "Tapping a card selects it with an active amber glow border and auto-populates the rich editable textarea below."
+    },
+    "step_4_action_cta": {
+      "primary_button": "Copy Review & Open Google",
+      "toast_message": "Review copied to clipboard! Paste it on Google Review box.",
+      "google_link": "https://maps.google.com/?q=Mana+Restaurant+Shankarpally",
+      "secondary_options": [
+        "Copy Text Only",
+        "Regenerate AI Drafts",
+        "Start Fresh"
+      ]
+    }
+  },
+  "offline_capabilities": {
+    "engine": "Local algorithmic template synthesizer + cached LLM permutations in localStorage",
+    "banner": "You are offline. Your review draft will still work locally.",
+    "crm_fallback": "Offline complaints are stored in indexedDB / localStorage queue and synced once connection restores."
+  },
+  "motion": {
+    "screen_transitions": "AnimatePresence with slide-up & fade (y: 12, opacity: 0 -> y: 0, opacity: 1, duration: 0.25s)",
+    "pill_toggle": "spring scale-in (scale: 0.96 -> 1.0, duration: 0.15s)",
+    "star_rating_hover": "scale: 1.15, rotate: [-2, 2, 0]",
+    "ai_generating_pulse": "warm amber shimmer bar with staggered pill highlights"
+  },
+  "accessibility": {
+    "touch_targets": "Minimum 48px height on all interactive tags and CTA buttons",
+    "contrast_check": "All text tokens meet 4.5:1 on their respective surface tokens",
+    "reduced_motion": "Respects prefers-reduced-motion using conditional CSS transitions",
+    "data_testids": "Every button, star, pill, textarea, card, and toast trigger MUST contain explicit data-testid attributes"
+  },
+  "image_urls": [
+    {
+      "category": "hero_banner",
+      "url": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjByZXN0YXVyYW50JTIwZGluaW5nJTIwYmlyeWFuaXxlbnwwfHx8fDE3OTM4NjA5MTJ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Authentic Hyderabadi Dum Biryani hero banner for Mana Restaurant"
+    },
+    {
+      "category": "dish_thumb_spices",
+      "url": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwzfHxpbmRpYW4lMjBzcGljZXMlMjBhZXN0aGV0aWMlMjBmb29kfGVufDB8fHx8MTc5Mzg2MDkxMnww&ixlib=rb-4.1.0&q=85",
+      "description": "Aesthetic Indian spices flatlay texture"
+    },
+    {
+      "category": "restaurant_ambiance_dish",
+      "url": "https://images.unsplash.com/photo-1716550781939-beb7d7247aae?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwzfHxpbmRpYW4lMjByZXN0YXVyYW50JTIwZGluaW5nJTIwYmlyeWFuaXxlbnwwfHx8fDE3OTM4NjA5MTJ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Special Biryani & Curry table presentation"
+    }
+  ],
+  "instructions_to_main_agent": [
+    "Template is farm-ts (FastAPI backend + Vite/React 19 frontend). CSS entry is frontend/src/index.css.",
+    "In frontend/src/index.css, import '@fontsource-variable/lora' for headings and '@fontsource-variable/plus-jakarta-sans' for body.",
+    "Implement the app inside frontend/src/pages/Home.tsx with clean modular components or subcomponents in frontend/src/components/review/.",
+    "Ensure zero login: no signup wall, instant QR table experience. Support simulated POS order switch (e.g. Table 12: Special Chicken Biryani, Paneer Tikka, Butter Naan).",
+    "Support offline-first mode: test with window.navigator.onLine toggle or mock offline switch in header to preview offline banner and client-side generative draft fallback.",
+    "Provide rich AI review draft generation with realistic authentic prompt synthesizer (incorporating selected POS dishes, food tags, service tags, and user custom note).",
+    "Make sure Step 1 (1-3 stars -> CRM form with manager alert toast/thank you) and (4-5 stars -> Step 2 Tags -> Step 3 Drafts -> Step 4 Copy & Google) are seamless with smooth motion transitions.",
+    "Include sonner toast notifications with 'Review copied! Paste it on Google.' and direct window.open trigger.",
+    "Add full data-testid attributes to all interactive elements for test compliance."
+  ]
+}
