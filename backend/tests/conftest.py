@@ -45,3 +45,19 @@ async def aclient():
 
 
 # --- app-specific fixtures below this line ---
+
+
+def authed_client(email: str, password: str) -> httpx.Client:
+    """Logs in and returns an httpx.Client that sends the session cookie on every request.
+
+    The backend issues the `rs_session` cookie with Secure=True (it's served over HTTPS in
+    production). httpx's cookie jar honours that flag and won't replay it over the plain
+    http://localhost used by these tests, so the token is copied into a manual Cookie header
+    instead of relying on the jar.
+    """
+    c = httpx.Client(base_url=API_URL, timeout=30.0)
+    r = c.post("/auth/login", json={"email": email, "password": password})
+    r.raise_for_status()
+    token = r.cookies.get("rs_session")
+    c.headers["Cookie"] = f"rs_session={token}"
+    return c

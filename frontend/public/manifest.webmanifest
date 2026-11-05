@@ -1,6 +1,6 @@
 {
-  "name": "Mana Restaurant — Share Your Experience",
-  "short_name": "Mana Review",
+  "name": "Review Studio — Share Your Experience",
+  "short_name": "Review Studio",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FDFBF7",

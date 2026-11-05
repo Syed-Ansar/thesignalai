@@ -1,8 +1,13 @@
 {
-  "theme": "warm_hospitality_light",
-  "app_archetype": "ORGANIC & EARTHY",
-  "design_rationale": "Inspired by Candour.app QR micro-experiences and modern Indian fine casual hospitality (Mana Restaurant, Shankarpally). Built as an offline-first PWA review assistant for mobile portrait view (max 480px centered on desktop) with zero-login friction. Warm cream/amber palette, rich saffron/terracotta kinetic triggers, pill-shaped tags, and empathetic multi-step transition flows.",
+  "theme": "hybrid_adaptive_cream",
+  "design_philosophy": {
+    "concept": "Arcade Flavor Quest — Subway Surfers energy meets contemporary Indian dining hospitality",
+    "blend": "Playful arcade progression (XP counter, coin bursts, snappy card swipes, scratch card unlock) grounded in warm artisanal dining aesthetics (saffron, cardamom, terracotta, rich cream background).",
+    "target_device": "Mobile-first PWA (max 480px centered on desktop viewport)",
+    "context": "QR table scan at Indian restaurants — zero friction, 0 logins, high dopamine, transparent reward"
+  },
   "colors": {
+    "palette_strategy": "CSS Variable driven dynamic multi-tenant engine supporting any restaurant accent colour while defaulting to Royal Saffron on Warm Kulhad Cream",
     "surfaces": [
       {
         "name": "page",
@@ -11,11 +16,9 @@
         "on_bg": "#1C1917",
         "on_bg_muted": "#57534E",
         "roles": {
-          "border": "#E7E2DA",
-          "link": "#C2410C",
-          "error": "#B91C1C",
-          "success": "#15803D",
-          "warning": "#B45309"
+          "link": "#EA580C",
+          "error": "#DC2626",
+          "success": "#16A34A"
         }
       },
       {
@@ -23,251 +26,252 @@
         "kind": "solid",
         "bg": "#FFFFFF",
         "on_bg": "#1C1917",
-        "on_bg_muted": "#57534E",
-        "roles": {
-          "border": "#EFEAE1",
-          "subtle_bg": "#F7F4EE"
-        }
+        "on_bg_muted": "#57534E"
       },
       {
-        "name": "banner",
+        "name": "arcade_card",
         "kind": "solid",
-        "bg": "#292524",
-        "on_bg": "#FAF8F5",
-        "on_bg_muted": "#D6D3D1",
-        "roles": {
-          "accent_badge": "#FBBF24",
-          "accent_badge_text": "#78350F"
-        }
-      },
-      {
-        "name": "pill_inactive",
-        "kind": "solid",
-        "bg": "#F5F2EB",
-        "on_bg": "#44403C",
-        "on_bg_muted": "#78716C",
-        "roles": {
-          "border": "#E7E2DA"
-        }
-      },
-      {
-        "name": "pill_active",
-        "kind": "solid",
-        "bg": "#EA580C",
-        "on_bg": "#FFFFFF",
-        "on_bg_muted": "#FED7AA",
-        "roles": {
-          "border": "#C2410C"
-        }
-      },
-      {
-        "name": "card_draft_selected",
-        "kind": "solid",
-        "bg": "#FFFBEB",
+        "bg": "#FFFFFF",
         "on_bg": "#1C1917",
-        "on_bg_muted": "#78350F",
+        "on_bg_muted": "#57534E"
+      },
+      {
+        "name": "inverse",
+        "kind": "solid",
+        "bg": "#1C1917",
+        "on_bg": "#FAFAF9",
+        "on_bg_muted": "#A8A29E"
+      },
+      {
+        "name": "hero",
+        "kind": "image",
+        "contrast_against": "#18181B",
+        "guarantee": "scrim: linear-gradient(180deg, rgba(28,25,23,0.7) 0%, rgba(28,25,23,0.9) 100%)",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#E7E5E4",
         "roles": {
-          "border": "#F59E0B"
+          "link": "#FDBA74",
+          "error": "#FCA5A5",
+          "success": "#86EFAC"
         }
       },
       {
-        "name": "crm_banner",
+        "name": "scratch_foil",
         "kind": "solid",
-        "bg": "#FEF2F2",
-        "on_bg": "#991B1B",
-        "on_bg_muted": "#B91C1C",
-        "roles": {
-          "border": "#FECACA"
-        }
+        "bg": "#E2E8F0",
+        "on_bg": "#1E293B",
+        "on_bg_muted": "#475569"
       },
       {
-        "name": "offline_bar",
+        "name": "reward_gold",
         "kind": "solid",
-        "bg": "#451A03",
-        "on_bg": "#FEF3C7",
-        "on_bg_muted": "#FDE68A"
+        "bg": "#FEF3C7",
+        "on_bg": "#78350F",
+        "on_bg_muted": "#92400E"
       }
     ],
     "accent": "#EA580C",
     "on_accent": "#FFFFFF",
-    "amber_star": "#F59E0B",
-    "gold_badge": "#D97706"
+    "css_variable_mapping": {
+      "--g-accent": "var(--restaurant-accent, #EA580C)",
+      "--g-on-accent": "#FFFFFF",
+      "--g-bg": "#FDFBF7",
+      "--g-card": "#FFFFFF",
+      "--g-ink": "#1C1917",
+      "--g-muted": "#57534E",
+      "--g-card-ink": "#1C1917",
+      "--g-line": "#E7E5E4",
+      "--g-chip-r": "9999px",
+      "--g-btn-r": "16px",
+      "--g-card-r": "24px"
+    }
   },
   "typography": {
-    "font_heading": "Lora Variable",
-    "font_sans": "Plus Jakarta Sans Variable",
-    "font_mono": "JetBrains Mono Variable",
+    "headline_font": "Space Grotesk Variable, Sora Variable, sans-serif",
+    "body_font": "Plus Jakarta Sans Variable, Inter, sans-serif",
+    "display_font": "Space Grotesk Variable, sans-serif",
     "scale_px": {
-      "display": 36,
-      "h1": 28,
-      "h2": 22,
-      "h3": 18,
+      "display": 48,
+      "h1": 36,
+      "h2": 28,
+      "h3": 20,
       "body": 16,
       "caption": 14
     },
-    "letter_spacing": {
-      "headline": "-0.02em",
-      "overline": "0.15em"
+    "hierarchy_rules": {
+      "arcade_counter": "text-2xl font-black font-display tracking-tight text-amber-500",
+      "level_header": "text-2xl sm:text-3xl font-extrabold tracking-tight text-stone-900 leading-snug",
+      "level_subtext": "text-sm sm:text-base text-stone-600 font-medium leading-relaxed",
+      "button_label": "text-base font-bold tracking-wide uppercase",
+      "badge_text": "text-xs font-bold tracking-widest uppercase"
     }
   },
   "entry_surfaces": {
-    "/": "Mobile portrait container max-480px with warm restaurant header (Mana Restaurant, Shankarpally), live offline indicator, table/POS order card, and interactive 5-star rating entry screen"
+    "/": "gamified mobile arcade shell — sticky XP header + level progress ribbon top, swipeable quest card center, sticky action dock bottom",
+    "/review": "gamified multi-stage quest — live coin counter top, interactive dish/vibe tiles center, haptic submit bottom",
+    "/reward": "golden scratch arena — reward chest teaser top, canvas scratch card center, reveal confetti blast + claim code bottom"
   },
-  "layout_and_container": {
-    "max_width": "max-w-[480px]",
-    "alignment": "mx-auto min-h-screen bg-[#FDFBF7] shadow-2xl border-x border-[#EFEAE1] relative flex flex-col",
-    "desktop_backdrop": "bg-[#1E1B18] flex items-center justify-center p-0 sm:py-6 sm:px-4",
-    "pwa_safe_areas": "pt-safe pb-safe px-4 sm:px-6"
+  "visual_enhancers": {
+    "floating_xp_pills": "Animated '+10 XP' or '+50 PTS' floating badges with spring bounce when guest interacts (e.g., taps a star, selects a dish tag)",
+    "progress_track": "Subway-surfers style tiered milestone rail (Level 1: Taste Score -> Level 2: Star Dishes -> Level 3: Vibe & Chef Note -> Level 4: Magic Draft -> Level 5: Mystery Reward)",
+    "haptic_tactile_feedback": "Active button depression (scale: 0.96) with 2px solid bottom-border offset giving an arcade game cartridge tactile feel",
+    "cooking_loader_animation": "Wok stir-fry & spice bubbling particle animation while AI generates the single review draft",
+    "canvas_scratch_layer": "HTML5 Canvas scratch-off surface with metallic foil texture, sparkle particles, 65% reveal threshold auto-wipe, and crisp confetti explosion",
+    "offline_status_ribbon": "Pill banner at top with cloud-off icon: 'Offline mode active — your reward & review save locally!'"
   },
-  "step_flow_architecture": {
-    "step_0_header": "Restaurant signature header with warm amber motif, location tag 'Shankarpally, Hyderabad', POS Table #12 badge, and active offline status bar.",
-    "step_1_star_gate": {
-      "prompt": "How was your dining experience today?",
-      "component": "Interactive star selector (1 to 5 stars) with warm pulse micro-interactions and tactile score descriptions ('Poor', 'Fair', 'Average', 'Very Good', 'Exceptional!')",
-      "branching": "1-3 stars triggers CRM Resolution flow; 4-5 stars advances immediately to Step 2 AI review generation"
-    },
-    "crm_feedback_branch": {
-      "condition": "1-3 Stars selected",
-      "title": "What went wrong with your food or service?",
-      "subtitle": "Your feedback reaches our General Manager directly to make things right.",
-      "category_pills": [
-        "Food Taste/Spiciness",
-        "Order Delay",
-        "Staff Attentiveness",
-        "Cleanliness / Cutlery",
-        "Billing / POS Issue",
-        "Portion Size"
-      ],
-      "fields": [
-        "Feedback Textarea (required)",
-        "Optional Phone / Table Number"
-      ],
-      "submit_cta": "Submit Direct Feedback",
-      "resolution_state": "Thank you. Our restaurant manager has been notified directly via SMS & CRM alert. We appreciate your honesty and will address this immediately."
-    },
-    "step_2_tag_selection": {
-      "condition": "4-5 Stars selected",
-      "sections": [
-        {
-          "category": "Ordered from Your Bill (Petpooja POS)",
-          "badge": "POS Verified",
-          "pills": [
-            "Special Chicken Biryani",
-            "Paneer Tikka",
-            "Butter Naan",
-            "Mutton Rogan Josh",
-            "Gulab Jamun"
-          ]
-        },
-        {
-          "category": "Food Specialties",
-          "pills": [
-            "Delicious Biryani",
-            "Authentic Spices",
-            "Fresh Ingredients",
-            "Crispy Starters",
-            "Great Desserts"
-          ]
-        },
-        {
-          "category": "Service & Ambiance",
-          "pills": [
-            "Quick Service",
-            "Polite & Helpful Staff",
-            "Clean & Hygienic",
-            "Family Friendly",
-            "Nice Ambiance"
-          ]
-        },
-        {
-          "category": "Value & Experience",
-          "pills": [
-            "Value for Money",
-            "Generous Portions"
-          ]
-        }
-      ],
-      "optional_note": "Any specific dish name or note? (Optional)",
-      "primary_cta": "Generate 3 Review Ideas"
-    },
-    "step_3_ai_draft_cards": {
-      "description": "3 Distinct review voices tailored for Indian restaurant Google profiles",
-      "styles": [
-        {
-          "id": "short",
-          "label": "Short & Direct",
-          "badge": "15 Sec Read",
-          "desc": "Crisp, impactful, highlights key dishes & service"
-        },
-        {
-          "id": "detailed",
-          "label": "Descriptive & Detailed",
-          "badge": "Foodie Guide",
-          "desc": "Elaborates on authentic spices, ambiance & portion sizes"
-        },
-        {
-          "id": "hinglish",
-          "label": "Warm & Casual Hinglish",
-          "badge": "Local Vibe",
-          "desc": "Natural conversational Hinglish with genuine appreciation"
-        }
-      ],
-      "interaction": "Tapping a card selects it with an active amber glow border and auto-populates the rich editable textarea below."
-    },
-    "step_4_action_cta": {
-      "primary_button": "Copy Review & Open Google",
-      "toast_message": "Review copied to clipboard! Paste it on Google Review box.",
-      "google_link": "https://maps.google.com/?q=Mana+Restaurant+Shankarpally",
-      "secondary_options": [
-        "Copy Text Only",
-        "Regenerate AI Drafts",
-        "Start Fresh"
+  "levels_breakdown": {
+    "header_hud": {
+      "title": "Arcade HUD Bar",
+      "elements": [
+        "Restaurant Avatar + Name + Table No badge",
+        "XP/Coin Balance Badge with spinning coin icon (e.g., '120 XP')",
+        "Live 4-segment animated progress rail (Subway Surfers sprint bar with glowing active pip)"
       ]
+    },
+    "level_1_rating": {
+      "title": "Level 1: Rate the Feast",
+      "heading_copy": "How was the feast today?",
+      "subheading_copy": "Tap your score to kick off your reward quest (+20 XP)",
+      "component": "Big juicy interactive stars or expressive emoji cards (1-5) with scale bounce on hover/tap",
+      "branching_logic": {
+        "4_to_5_stars": "Unlocks Level 2 (Dishes) -> Happy path -> AI Google Review Draft",
+        "1_to_3_stars": "Directs to Private Guest Care portal (+30 XP) -> Direct feedback to General Manager -> Instant 'We are sorry' Scratch Reward"
+      },
+      "cta_button_text": "Lock In My Score ⚡"
+    },
+    "level_2_dishes": {
+      "title": "Level 2: What Hit the Spot?",
+      "heading_copy": "Pick the champions of your table!",
+      "subheading_copy": "Select up to 4 dishes (+10 XP each)",
+      "component": "2-column grid of rich dish cards with food icons, dish thumbnail, spice level badge, and checkmark toggle states with pop animations",
+      "cta_button_text": "Continue the Quest 🚀"
+    },
+    "level_3_vibes_notes": {
+      "title": "Level 3: Vibe & Chef Shout-out",
+      "heading_copy": "What made the ambiance special?",
+      "subheading_copy": "Tap vibe chips + add an optional note for the kitchen (+20 XP)",
+      "component": "Multi-select chip cloud (e.g. '⚡ Fast Service', '🎵 Great Music', '🔥 Royal Hospitality', '👨‍🍳 Chef Special') + expandable micro-textarea with placeholder 'e.g. The Dum Biryani gravy was unmatched!'",
+      "cta_button_text": "Cook My Review ✨"
+    },
+    "level_3_5_cooking_loader": {
+      "title": "Full Screen AI Cooking State",
+      "heading_copy": "Chef AI is cooking your review draft...",
+      "subheading_copy": "Blending your selected dishes, spices, and vibes into a 5-star masterpiece",
+      "animation": "Animated Tandoor / Kadai icon with floating aroma particles and progress tick-list: 'Adding Biryani love...', 'Seasoning compliments...', 'Polishing Google review...'"
+    },
+    "level_4_review_draft": {
+      "title": "Level 4: Review Ready for Google",
+      "heading_copy": "Your 5-Star Masterpiece is Ready!",
+      "subheading_copy": "1-click copy & share on Google to instantly unlock your scratch reward (+50 XP)",
+      "card_features": [
+        "Single clean editable text card with live character count",
+        "'🎲 Remix Draft' button to cycle tone (Foodie, Concise, Royal Feast)",
+        "'📋 Copy & Open Google Review' primary glowing action button"
+      ],
+      "secondary_action": "Skip to Reward (if already posted)"
+    },
+    "level_5_reward_scratch": {
+      "title": "Level 5: Grab Your Table Reward",
+      "heading_copy": "Unlock Your Secret Table Reward! 🎁",
+      "subheading_copy": "Enter your mobile number to reveal your instant gift",
+      "flow": [
+        "Step A: Enter Guest Name & 10-digit Phone Number",
+        "Step B: Fast 6-digit SMS verification code (demo mode shows instant auto-fill code pill 'Tap to Fill: 789456')",
+        "Step C: HTML5 Canvas Scratch-Off Card (Scratch with finger/cursor to wipe metallic layer)",
+        "Step D: Reveal celebration with confetti blast, voucher code (e.g. 'CHEF-GIFT-15'), '15% Off Your Next Dine-in', and 'Save to WhatsApp / Show to Server' action"
+      ],
+      "unhappy_path_framing": "We value your honest feedback deeply. Please enjoy this complimentary dessert/discount on your next visit as our warm apology."
+    },
+    "error_and_edge_states": {
+      "ai_generation_failed": {
+        "title": "Oops! The AI Kitchen got a bit smoky",
+        "body": "No worries — we have saved your dish picks. You can write your own words or try cooking again.",
+        "primary_action": "Try Cooking Again 🔄",
+        "secondary_action": "Write Manually ✏️"
+      },
+      "offline_screen": {
+        "title": "You are currently offline",
+        "body": "Don't fret! Your review draft and table reward code are safely cached on this phone.",
+        "primary_action": "Continue in Offline Mode ⚡"
+      },
+      "restaurant_not_found": {
+        "title": "Table QR Expired or Table Not Found",
+        "body": "Please ask your server for a fresh QR code or select your restaurant branch.",
+        "primary_action": "Scan Again 📷"
+      }
     }
-  },
-  "offline_capabilities": {
-    "engine": "Local algorithmic template synthesizer + cached LLM permutations in localStorage",
-    "banner": "You are offline. Your review draft will still work locally.",
-    "crm_fallback": "Offline complaints are stored in indexedDB / localStorage queue and synced once connection restores."
   },
   "motion": {
-    "screen_transitions": "AnimatePresence with slide-up & fade (y: 12, opacity: 0 -> y: 0, opacity: 1, duration: 0.25s)",
-    "pill_toggle": "spring scale-in (scale: 0.96 -> 1.0, duration: 0.15s)",
-    "star_rating_hover": "scale: 1.15, rotate: [-2, 2, 0]",
-    "ai_generating_pulse": "warm amber shimmer bar with staggered pill highlights"
+    "spring_physics": {
+      "snappy_card": { "type": "spring", "stiffness": 400, "damping": 28 },
+      "bouncy_xp_pop": { "type": "spring", "stiffness": 500, "damping": 15 },
+      "smooth_level_transition": { "type": "spring", "stiffness": 300, "damping": 30 }
+    },
+    "keyframes": {
+      "coin_spin": "@keyframes spinCoin { 0% { transform: rotateY(0deg) scale(1); } 50% { transform: rotateY(180deg) scale(1.15); } 100% { transform: rotateY(360deg) scale(1); } }",
+      "shimmer_foil": "@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }",
+      "steam_float": "@keyframes steamFloat { 0% { transform: translateY(0px) opacity(0.8); } 100% { transform: translateY(-24px) opacity(0); } }"
+    }
   },
   "accessibility": {
-    "touch_targets": "Minimum 48px height on all interactive tags and CTA buttons",
-    "contrast_check": "All text tokens meet 4.5:1 on their respective surface tokens",
-    "reduced_motion": "Respects prefers-reduced-motion using conditional CSS transitions",
-    "data_testids": "Every button, star, pill, textarea, card, and toast trigger MUST contain explicit data-testid attributes"
+    "aria_roles": "All custom scratch canvases must have aria-label='Interactive scratch-off reward card' with keyboard fallback 'Reveal Reward Now' button.",
+    "color_contrast": "All text tokens strictly comply with minimum 4.5:1 ratio over cream (#FDFBF7) and card (#FFFFFF) surfaces.",
+    "reduced_motion": "Respect 'prefers-reduced-motion: reduce' by substituting complex canvas sparkles with instant fade reveals and disabling parallax.",
+    "touch_targets": "All tappable chips, stars, and buttons maintain minimum 48px x 48px touch bounding box."
   },
-  "image_urls": [
-    {
-      "category": "hero_banner",
-      "url": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjByZXN0YXVyYW50JTIwZGluaW5nJTIwYmlyeWFuaXxlbnwwfHx8fDE3OTM4NjA5MTJ8MA&ixlib=rb-4.1.0&q=85",
-      "description": "Authentic Hyderabadi Dum Biryani hero banner for Mana Restaurant"
-    },
-    {
-      "category": "dish_thumb_spices",
-      "url": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwzfHxpbmRpYW4lMjBzcGljZXMlMjBhZXN0aGV0aWMlMjBmb29kfGVufDB8fHx8MTc5Mzg2MDkxMnww&ixlib=rb-4.1.0&q=85",
-      "description": "Aesthetic Indian spices flatlay texture"
-    },
-    {
-      "category": "restaurant_ambiance_dish",
-      "url": "https://images.unsplash.com/photo-1716550781939-beb7d7247aae?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwzfHxpbmRpYW4lMjByZXN0YXVyYW50JTIwZGluaW5nJTIwYmlyeWFuaXxlbnwwfHx8fDE3OTM4NjA5MTJ8MA&ixlib=rb-4.1.0&q=85",
-      "description": "Special Biryani & Curry table presentation"
-    }
-  ],
+  "media": {
+    "image_urls": [
+      {
+        "category": "dish_hero_preview",
+        "url": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjBmb29kJTIwYmlyeWFuaSUyMGN1cnJ5JTIwZmVhc3R8ZW58MHx8fHwxNzkzODY2NTkxfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Aromatic Hyderabadi Dum Biryani with saffron rice & fresh herbs"
+      },
+      {
+        "category": "table_feast_spread",
+        "url": "https://images.unsplash.com/photo-1728910156510-77488f19b152?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHwyfHxpbmRpYW4lMjBmb29kJTIwYmlyeWFuaSUyMGN1cnJ5JTIwZmVhc3R8ZW58MHx8fHwxNzkzODY2NTkxfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Rich Indian copper handi curry table feast with naan and appetizers"
+      },
+      {
+        "category": "starter_platter",
+        "url": "https://images.unsplash.com/photo-1599043513900-ed6fe01d3833?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHw0fHxpbmRpYW4lMjBmb29kJTIwYmlyeWFuaSUyMGN1cnJ5JTIwZmVhc3R8ZW58MHx8fHwxNzkzODY2NTkxfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Authentic flavored rice plate with South Indian curry leaves"
+      }
+    ]
+  },
+  "data_testid_manifest": {
+    "hud_xp_badge": "guest-hud-xp-badge",
+    "hud_level_progress": "guest-hud-level-progress",
+    "level_1_star_prefix": "guest-rating-star-",
+    "level_1_submit_btn": "guest-rating-submit-btn",
+    "level_2_dish_chip_prefix": "guest-dish-chip-",
+    "level_2_continue_btn": "guest-dishes-continue-btn",
+    "level_3_vibe_chip_prefix": "guest-vibe-chip-",
+    "level_3_note_input": "guest-vibe-note-input",
+    "level_3_generate_btn": "guest-vibe-generate-btn",
+    "level_4_draft_card": "guest-review-draft-card",
+    "level_4_draft_textarea": "guest-review-draft-textarea",
+    "level_4_remix_btn": "guest-review-remix-btn",
+    "level_4_copy_google_btn": "guest-review-copy-google-btn",
+    "level_4_skip_reward_btn": "guest-review-skip-reward-btn",
+    "reward_name_input": "guest-reward-name-input",
+    "reward_phone_input": "guest-reward-phone-input",
+    "reward_send_sms_btn": "guest-reward-send-sms-btn",
+    "reward_otp_input": "guest-reward-otp-input",
+    "reward_otp_autofill_btn": "guest-reward-otp-autofill-btn",
+    "reward_verify_btn": "guest-reward-verify-btn",
+    "reward_scratch_canvas": "guest-reward-scratch-canvas",
+    "reward_claim_code": "guest-reward-claim-code",
+    "reward_show_server_btn": "guest-reward-show-server-btn",
+    "private_feedback_textarea": "guest-private-feedback-textarea",
+    "private_feedback_submit_btn": "guest-private-feedback-submit-btn"
+  },
   "instructions_to_main_agent": [
-    "Template is farm-ts (FastAPI backend + Vite/React 19 frontend). CSS entry is frontend/src/index.css.",
-    "In frontend/src/index.css, import '@fontsource-variable/lora' for headings and '@fontsource-variable/plus-jakarta-sans' for body.",
-    "Implement the app inside frontend/src/pages/Home.tsx with clean modular components or subcomponents in frontend/src/components/review/.",
-    "Ensure zero login: no signup wall, instant QR table experience. Support simulated POS order switch (e.g. Table 12: Special Chicken Biryani, Paneer Tikka, Butter Naan).",
-    "Support offline-first mode: test with window.navigator.onLine toggle or mock offline switch in header to preview offline banner and client-side generative draft fallback.",
-    "Provide rich AI review draft generation with realistic authentic prompt synthesizer (incorporating selected POS dishes, food tags, service tags, and user custom note).",
-    "Make sure Step 1 (1-3 stars -> CRM form with manager alert toast/thank you) and (4-5 stars -> Step 2 Tags -> Step 3 Drafts -> Step 4 Copy & Google) are seamless with smooth motion transitions.",
-    "Include sonner toast notifications with 'Review copied! Paste it on Google.' and direct window.open trigger.",
-    "Add full data-testid attributes to all interactive elements for test compliance."
+    "1. Replace boring multi-step forms with an arcade-style card stage navigation driven by motion/react AnimatePresence with directional x-slide.",
+    "2. Implement the floating coin / XP counter in the header that pops with '+10 XP' every time the guest taps an option.",
+    "3. Change the AI generation output from 3 drafts to 1 prominent editable draft with a '🎲 Remix Tone' button (Foodie -> Royal Feast -> Quick & Crisp).",
+    "4. Place the Phone + SMS verification strictly at Level 5 as the 'Unlock Table Reward' step, including demo-mode 1-tap OTP fill.",
+    "5. Build the HTML5 canvas scratch card with silver/gold glitter gradient overlay and touch-move eraser (globalCompositeOperation = 'destination-out'). Once 60-70% is cleared, automatically trigger full reveal with react-confetti or canvas-confetti blast.",
+    "6. Handle the unhappy path (1-3 stars): pivot smoothly into 'Private Chef Note' with empathetic tone, then immediately transition to Level 5 with 'A Token of Our Apology' scratch reward.",
+    "7. Implement playful animated full-screen cooking loader and fallback retry states for offline or AI generation errors."
   ]
 }

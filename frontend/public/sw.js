@@ -1,7 +1,7 @@
 /* Mana Review — offline-first service worker.
    Network-first for everything GET (so fresh code always wins when online),
    falling back to the cache when the network drops. POSTs are never cached. */
-const CACHE = "mana-review-v1";
+const CACHE = "review-studio-v2";
 const SHELL = ["/", "/manifest.webmanifest", "/favicon.svg", "/apple-touch-icon.png"];
 
 self.addEventListener("install", (event) => {

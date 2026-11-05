@@ -17,12 +17,14 @@ load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
 from lib.db import client, db, ensure_indexes
+from lib.bootstrap import bootstrap
 
 
 # Startup runs before the yield, shutdown after it. Add your own setup/teardown here.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.index_task = asyncio.create_task(ensure_indexes())  # background: a big index build must not block boot
+    app.state.seed_task = asyncio.create_task(bootstrap())  # idempotent: super-admin + sample restaurants
     yield
     app.state.index_task.cancel()  # stop a build still running before its client closes
     with suppress(asyncio.CancelledError):
@@ -63,9 +65,13 @@ async def get_status_checks():
     status_checks = await db.status_checks.find().to_list(1000)
     return [StatusCheck(**status_check) for status_check in status_checks]
 
-from routers.review import router as review_router  # noqa: E402
+from routers.auth import router as auth_router  # noqa: E402
+from routers.admin import router as admin_router  # noqa: E402
+from routers.public import router as public_router  # noqa: E402
 
-api_router.include_router(review_router)
+api_router.include_router(auth_router)
+api_router.include_router(admin_router)
+api_router.include_router(public_router)
 
 # Include the router in the main app
 app.include_router(api_router)
